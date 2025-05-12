@@ -1,35 +1,72 @@
-Guitar 🎸
-A project focused on [briefly describe the purpose of the project, e.g., learning about guitar chords, building a guitar-related app, etc.].
+# Guitar Fretboard Web App
 
-Features
-[Feature 1: e.g., Interactive chord diagrams]
-[Feature 2: e.g., Tuning assistant]
-[Feature 3: e.g., Song library with guitar tabs]
-Installation
-Clone this repository to your local machine:
+A fully client-side, interactive web application that visually represents a 6-string guitar fretboard with 22 frets. Built using only HTML, CSS, and JavaScript — no frameworks, no build tools.
 
-bash
-git clone https://github.com/lotek4u/guitar.git
-cd guitar
-Install dependencies:
+---
 
-bash
-# If applicable
-npm install
-Usage
-[Step 1: e.g., Open the app using npm start]
-[Step 2: e.g., Select a chord or song to explore]
-[Step 3: e.g., Enjoy playing!]
-Contributing
-Contributions are welcome! Please follow these steps:
+## 🎸 Features
 
-Fork the repository.
-Create a new branch for your feature or bug fix.
-Submit a pull request with a clear description of your changes.
-License
-This project is licensed under the MIT License.
+- **Interactive Fretboard Display**
+  - Standard 6-string layout (EADGBE by default)
+  - 22 frets with accurate visual spacing and nut
 
-Contact
-For questions or feedback, feel free to reach out:
+- **Tuning Controls**
+  - Global down-tuning selector (Standard to A# Standard)
+  - Per-string tuning selectors with half-step increments
 
-GitHub: lotek4u
+- **Note Highlighting**
+  - Click any note cell to highlight it and all identical notes on the fretboard
+  - Selected note: bright green with bold text
+  - Matching notes: dark green background
+
+- **Automatic Reset**
+  - Clicking outside the fretboard or changing tuning resets highlighting
+
+---
+
+## 📦 How to Use
+
+1. Clone or download this repo.
+2. Open `index.html` in your browser.
+3. Use the dropdowns to adjust tunings.
+4. Click any note cell to highlight all matching notes.
+
+---
+
+## 🔧 Technical Details
+
+- **HTML/CSS/JS Only** — runs locally without a server
+- **Monospaced Font** used for dropdown alignment
+- **Pure DOM Manipulation** for maximum compatibility
+
+---
+
+## 📷 Screenshots
+
+![Screenshot of Fretboard App](screenshot.png)  
+*(Add your own image if needed)*
+
+---
+
+## ✍️ Customization
+
+You can easily change:
+
+- Tuning defaults (`standardTuning` in JS)
+- Number of frets (`fretPositions`)
+- Display behavior (e.g. toggle highlights instead of replacing)
+
+---
+
+## 💡 Future Ideas
+
+- Add support for 7 or 8-string guitars
+- Support drop tunings or alternate tunings (e.g. DADGAD)
+- Export current tuning as JSON or text
+- Add frequency or interval overlays
+
+---
+
+## 📄 License
+
+MIT License — free to use, modify, and distribute.
