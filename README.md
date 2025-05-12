@@ -8,7 +8,7 @@ A fully client-side, interactive web application that visually represents a 6-st
 
 - **Interactive Fretboard Display**
   - Standard 6-string layout (EADGBE by default)
-  - 22 frets with accurate visual spacing and nut
+  - 22 frets with open string and visual nut
 
 - **Tuning Controls**
   - Global down-tuning selector (Standard to A# Standard)
@@ -41,13 +41,6 @@ A fully client-side, interactive web application that visually represents a 6-st
 
 ---
 
-## 📷 Screenshots
-
-![Screenshot of Fretboard App](screenshot.png)  
-*(Add your own image if needed)*
-
----
-
 ## ✍️ Customization
 
 You can easily change:
@@ -60,9 +53,8 @@ You can easily change:
 
 ## 💡 Future Ideas
 
+- Add support for highlighting chords
 - Add support for 7 or 8-string guitars
-- Support drop tunings or alternate tunings (e.g. DADGAD)
-- Export current tuning as JSON or text
 - Add frequency or interval overlays
 
 ---
