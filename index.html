@@ -77,6 +77,8 @@
     margin-bottom: 10px;
   }
   select {
+  font-family: monospace;
+  white-space: pre;
     background: #222;
     color: white;
     border: 1px solid #555;
@@ -116,23 +118,20 @@ function getNote(start, fret) {
 
 function buildGlobalSelector() {
   const labelMap = {
-    "0": "E Standard         +0 Semitones",
-    "-1": "D# Standard       -1 Semitone",
-    "-2": "D Standard         -2 Semitones",
-    "-3": "C# Standard       -3 Semitones",
-    "-4": "C Standard         -4 Semitones",
-    "-5": "B Standard         -5 Semitones",
-    "-6": "A# Standard       -6 Semitones",
-    "-7": "A Standard         -7 Semitones",
-    "-8": "G# Standard        -8 Semitones",
-    "-9": "G Standard         -9 Semitones",
-    "-10": "F# Standard       -10 Semitones",
-    "-11": "F Standard        -11 Semitones"
+    "0":  "E  Standard     0 Semitones",
+    "-1": "D# Standard    -1 Semitone",
+    "-2": "D  Standard    -2 Semitones",
+    "-3": "C# Standard    -3 Semitones",
+    "-4": "C  Standard    -4 Semitones",
+    "-5": "B  Standard    -5 Semitones",
+    "-6": "A# Standard    -6 Semitones",
+    "-7": "A  Standard    -7 Semitones"
   };
   for (let shift = 0; shift >= -6; shift--) {
     const option = document.createElement("option");
     option.value = String(shift);
-    option.textContent = labelMap[String(shift)] || `${shift} semitones`;
+    const label = labelMap[String(shift)] || `${shift} semitones`;
+    option.textContent = label.padEnd(30, ' ');
     globalShift.appendChild(option);
   }
   globalShift.addEventListener("change", () => {
@@ -143,6 +142,7 @@ function buildGlobalSelector() {
       select.value = notes[newIndex];
     });
     drawFretboard();
+    clearHighlights();
   });
 }
 
@@ -158,11 +158,26 @@ function createTunerSelect(stringIndex, defaultNote) {
     if (i === 0) option.selected = true;
     select.appendChild(option);
   }
-  select.addEventListener("change", drawFretboard);
+  select.addEventListener("change", () => {
+    drawFretboard();
+    clearHighlights();
+  });
   tunerSelects[stringIndex] = select;
 }
 
+function clearHighlights() {
+  document.querySelectorAll('.string-cell').forEach(cell => {
+    cell.style.background = '';
+    cell.style.opacity = '';
+    cell.style.fontWeight = '500';
+    cell.style.color = 'white';
+  });
+}
+
 function drawFretboard() {
+  document.querySelectorAll('.string-cell').forEach(cell => {
+    cell.removeEventListener('click', cell.clickHandler);
+  });
   fretboard.innerHTML = "";
   const tuning = tunerSelects.map(s => s.value);
 
@@ -204,7 +219,19 @@ function drawFretboard() {
     tuning.forEach((stringNote, i) => {
       const span = document.createElement("span");
       span.className = "string-cell";
-      span.textContent = getNote(stringNote, fretIndex);
+      const note = getNote(stringNote, fretIndex);
+      span.textContent = note;
+      span.dataset.note = note;
+      span.clickHandler = function () {
+        clearHighlights();
+        document.querySelectorAll(`.string-cell[data-note='${note}']`).forEach(cell => {
+          cell.style.background = '#225522';
+          cell.style.color = 'white';
+        });
+        this.style.fontWeight = 'bold';
+        this.style.background = 'green';
+      };
+      span.addEventListener('click', span.clickHandler);
       span.style.width = i === 0 ? '75px' : '100px';
       div.appendChild(span);
     });
@@ -226,6 +253,15 @@ function drawFretboard() {
     fretboard.appendChild(div);
   }
 }
+
+window.addEventListener('click', (e) => {
+  const target = e.target;
+  const isCell = target.classList.contains('string-cell');
+  const isFretboard = fretboard.contains(target);
+  if (!isCell && !isFretboard) {
+    clearHighlights();
+  }
+});
 
 buildGlobalSelector();
 standardTuning.forEach((note, i) => createTunerSelect(i, note));
