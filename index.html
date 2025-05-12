@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Guitar Fretboard</title>
+<style>
+  body {
+    font-family: sans-serif;
+    background: #111;
+    color: white;
+    padding: 20px;
+  }
+  .fretboard {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 600px;
+    height: 920px;
+    margin-top: 20px;
+    border-left: 2px solid #888;
+    border-right: 2px solid #888;
+    background: #442C18;
+  }
+  .nut {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: white;
+    box-shadow: 0 0 4px #000;
+    z-index: 10;
+  }
+  .fret {
+    position: absolute;
+    left: 0;
+    width: 600px;
+    border-top: 1px solid #999;
+    font-size: 13px;
+    color: white;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    pointer-events: none;
+    background: rgba(255,255,255,0.05);
+  }
+  .fret span.string-cell {
+    height: 40px;
+    text-align: center;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+  }
+  .fret-number {
+    width: 25px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: bold;
+    background: white;
+    color: black;
+    border-right: 1px solid #666;
+    line-height: 40px;
+    height: 40px;
+  }
+  .string-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.15);
+  }
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  select {
+    background: #222;
+    color: white;
+    border: 1px solid #555;
+    padding: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+<h1>Guitar Fretboard</h1>
+<div class="controls">
+  <div>
+    <label for="globalShift">Global Down Tuning:</label>
+    <select id="globalShift" style="width: 450px;"></select>
+  </div>
+</div>
+<div class="fretboard" id="fretboard"></div>
+<script>
+const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const standardTuning = ["E", "A", "D", "G", "B", "E"];
+const fretPositions = Array.from({ length: 23 }, (_, i) => i);
+const markerFrets = [3, 5, 7, 9, 12, 15, 17, 19];
+const fretboard = document.getElementById("fretboard");
+const globalShift = document.getElementById("globalShift");
+let tunerSelects = [];
+
+function noteIndex(note) {
+  return notes.indexOf(note);
+}
+
+function getNote(start, fret) {
+  const index = (noteIndex(start) + fret) % 12;
+  return notes[index];
+}
+
+function buildGlobalSelector() {
+  const labelMap = {
+    "0": "E Standard         +0 Semitones",
+    "-1": "D# Standard       -1 Semitone",
+    "-2": "D Standard         -2 Semitones",
+    "-3": "C# Standard       -3 Semitones",
+    "-4": "C Standard         -4 Semitones",
+    "-5": "B Standard         -5 Semitones",
+    "-6": "A# Standard       -6 Semitones",
+    "-7": "A Standard         -7 Semitones",
+    "-8": "G# Standard        -8 Semitones",
+    "-9": "G Standard         -9 Semitones",
+    "-10": "F# Standard       -10 Semitones",
+    "-11": "F Standard        -11 Semitones"
+  };
+  for (let shift = 0; shift >= -6; shift--) {
+    const option = document.createElement("option");
+    option.value = String(shift);
+    option.textContent = labelMap[String(shift)] || `${shift} semitones`;
+    globalShift.appendChild(option);
+  }
+  globalShift.addEventListener("change", () => {
+    const shift = parseInt(globalShift.value, 10);
+    tunerSelects.forEach((select, i) => {
+      const baseNote = standardTuning[i];
+      const newIndex = (noteIndex(baseNote) + shift + 12) % 12;
+      select.value = notes[newIndex];
+    });
+    drawFretboard();
+  });
+}
+
+function createTunerSelect(stringIndex, defaultNote) {
+  const select = document.createElement("select");
+  select.dataset.string = stringIndex;
+  for (let i = -6; i <= 6; i++) {
+    const idx = (noteIndex(defaultNote) + i + 12) % 12;
+    const note = notes[idx];
+    const option = document.createElement("option");
+    option.value = note;
+    option.textContent = `${note} (${i >= 0 ? '+' : ''}${i})`;
+    if (i === 0) option.selected = true;
+    select.appendChild(option);
+  }
+  select.addEventListener("change", drawFretboard);
+  tunerSelects[stringIndex] = select;
+}
+
+function drawFretboard() {
+  fretboard.innerHTML = "";
+  const tuning = tunerSelects.map(s => s.value);
+
+  const stringOffsets = [25 + 75, 25 + 75 + 100, 25 + 75 + 200, 25 + 75 + 300, 25 + 75 + 400, 25 + 75 + 500];
+  stringOffsets.forEach(left => {
+    const line = document.createElement("div");
+    line.className = "string-line";
+    line.style.left = `${left}px`;
+    fretboard.appendChild(line);
+  });
+
+  const tunerDiv = document.createElement("div");
+  tunerDiv.className = "fret tuner";
+  tunerDiv.style.top = "0px";
+  tunerDiv.style.height = "40px";
+  tunerSelects.forEach(select => {
+    select.style.width = '100px';
+    select.style.height = '100%';
+    select.style.boxSizing = 'border-box';
+    const span = document.createElement("span");
+    span.className = "string-cell";
+    span.style.width = '100px';
+    span.appendChild(select);
+    tunerDiv.appendChild(span);
+  });
+  fretboard.appendChild(tunerDiv);
+
+  for (let fretIndex = 1; fretIndex < fretPositions.length; fretIndex++) {
+    const div = document.createElement("div");
+    div.className = "fret";
+    div.style.top = `${fretIndex * 40}px`;
+    div.style.height = "40px";
+
+    const label = document.createElement("div");
+    label.className = "fret-number";
+    label.textContent = fretIndex;
+    div.appendChild(label);
+
+    tuning.forEach((stringNote, i) => {
+      const span = document.createElement("span");
+      span.className = "string-cell";
+      span.textContent = getNote(stringNote, fretIndex);
+      span.style.width = i === 0 ? '75px' : '100px';
+      div.appendChild(span);
+    });
+
+    if (fretIndex === 1) {
+      const nut = document.createElement("div");
+      nut.className = "nut";
+      nut.style.top = `${fretIndex * 40}px`;
+      fretboard.appendChild(nut);
+    }
+
+    if (markerFrets.includes(fretIndex)) {
+      const dot = document.createElement("div");
+      dot.className = "dot-marker";
+      dot.style.top = `${fretIndex * 40 + 20}px`;
+      fretboard.appendChild(dot);
+    }
+
+    fretboard.appendChild(div);
+  }
+}
+
+buildGlobalSelector();
+standardTuning.forEach((note, i) => createTunerSelect(i, note));
+drawFretboard();
+</script>
+</body>
+</html>
