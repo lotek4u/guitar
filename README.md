@@ -1,4 +1,4 @@
-# Guitar Fretboard Web App
+# Guitar Fretboard Visualizer Web App
 
 A fully client-side, interactive web application that visually represents a 6-string guitar fretboard with 22 frets. Built using only HTML, CSS, and JavaScript — no frameworks, no build tools.
 
